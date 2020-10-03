@@ -1,49 +1,86 @@
+drop database avaliacao;
+
 create schema avaliacao;
 
 use avaliacao;
 
-create user 'user'@'localhost' identified by 'pass123';
+-- create user 'user'@'localhost' identified by 'pass123';
 
 grant select, insert, delete, update on avaliacao.* to user@'localhost';
 
-create table usu_usuario (
-  usu_id bigint unsigned primary key auto_increment,
-  usu_nome_usuario varchar(50) not null,
-  usu_senha varchar(50) not null,
-  constraint usu_nome_usuario_uk unique (usu_nome_usuario)
+CREATE TABLE Funcionario (
+    Func_nome VARCHAR(100),
+    Func_email VARCHAR(30),
+    Func_senha VARCHAR(30),
+    Func_cargo VARCHAR(100),
+    Func_salario FLOAT,
+    Func_CPF_CNPJ VARCHAR(14) PRIMARY KEY
 );
 
-create table pro_professor (
-  pro_id bigint unsigned primary key,
-  pro_titulo varchar(10),
-  constraint pro_usu_fk foreign key (pro_id)
-    references usu_usuario (usu_id)
+CREATE TABLE Cliente (
+    Cli_nome VARCHAR(100),
+    Cli_email VARCHAR(30),
+    Cli_senha VARCHAR(30),
+    Cli_CPF_CNPJ VARCHAR(14) PRIMARY KEY
 );
 
-create table alu_aluno (
-  alu_id bigint unsigned primary key,
-  alu_ra bigint unsigned not null,
-  constraint alu_usu_fk foreign key (alu_id)
-    references usu_usuario (usu_id),
-  constraint alu_ra_uk unique (alu_ra)
+CREATE TABLE Cartao (
+    Car_numero VARCHAR(20) PRIMARY KEY,
+    Car_nome VARCHAR(100),
+    Car_data VARCHAR(5),
+    Car_cod_seguranca VARCHAR(3),
+    CPF_CNPJ VARCHAR(14),
+    FOREIGN KEY (CPF_CNPJ) REFERENCES Cliente(Cli_CPF_CNPJ)
 );
 
-create table tra_trabalho (
-  tra_id bigint unsigned primary key auto_increment,
-  tra_titulo varchar(50) not null,
-  tra_data_hora_entrega datetime not null,
-  tra_local_arquivo varchar(200) not null,
-  pro_avaliador_id bigint unsigned,
-  constraint tra_pro_fk foreign key (pro_avaliador_id)
-    references pro_professor (pro_id)
+CREATE TABLE Produto (
+    Prod_cod NUMBER PRIMARY KEY,
+    Prod_nome VARCHAR(40),
+    Prod_marca VARCHAR(40),
+    Prod_un_medida VARCHAR(20),
+    Prod_preco INT
 );
 
-create table ent_entrega (
-  alu_id bigint unsigned,
-  tra_id bigint unsigned,
-  primary key (alu_id, tra_id),
-  constraint ent_alu_fk foreign key (alu_id)
-    references alu_aluno (alu_id),
-  constraint ent_tra_fk foreign key (tra_id)
-    references tra_trabalho (tra_id)
+CREATE TABLE Venda (
+    Cod_venda NUMBER PRIMARY KEY,
+    Valor_total_venda NUMBER,
+    Forma_pgto_venda VARCHAR(20),
+    CPF_CNPJ VARCHAR(14),
+    Prod_cod VARCHAR(10),
+    FOREIGN KEY (prod_cod) REFERENCES Produto(Prod_cod),
+    FOREIGN KEY (CPF_CNPJ) REFERENCES Cliente(Cli_CPF_CNPJ)
+);
+
+CREATE TABLE Produto_venda (
+    Prod_cod NUMBER,
+    Cod_venda NUMBER,
+    Quantidade_Prod INT,
+    FOREIGN KEY (Prod_cod) REFERENCES Produto(Prod_cod),
+    FOREIGN KEY (Cod_venda) REFERENCES Venda(Cod_venda)
+);
+
+CREATE TABLE Fornecedor (
+    Forn_nome VARCHAR(100),
+    Forn_categoria VARCHAR(40),
+    Forn_cod NUMBER PRIMARY KEY,
+    Endereco_id NUMBER,
+    FOREIGN KEY (Endereco_id) REFERENCES Endereco(end_id)
+);
+
+CREATE TABLE Produto_Fornecedor (
+    Prod_cod NUMBER,
+    Forn_cod NUMBER,
+    FOREIGN KEY (Prod_cod) REFERENCES Produto(Prod_cod),
+    FOREIGN KEY (Forn_cod) REFERENCES Fornecedor(Forn_cod),
+    CONSTRAINT UK_PROD_FORN UNIQUE(Prod_cod, Forn_cod)
+);
+
+CREATE TABLE Endereco (
+    end_id NUMBER,
+    end_logradouro VARCHAR(100),
+    end_numero VARCHAR(50),
+    end_bairro VARCHAR(30),
+    end_cep VARCHAR(9),
+    end_cidade VARCHAR(30),
+    end_cmpl VARCHAR(40)
 );
