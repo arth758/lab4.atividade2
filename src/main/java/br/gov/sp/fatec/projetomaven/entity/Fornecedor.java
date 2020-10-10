@@ -2,6 +2,7 @@ package br.gov.sp.fatec.projetomaven.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
@@ -21,8 +22,7 @@ public class Fornecedor {
     @Column(name = "Forn_cod")
     private Integer fornCod;
 
-    @ManyToMany
-    @JoinColumn(name = "Endereco_id")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "Endereco_id")
     private Integer enderecoId;
 
     public String getFornNome() {
